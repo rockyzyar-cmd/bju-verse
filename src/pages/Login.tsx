@@ -1,9 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signInAnonymously, updateProfile } from 'firebase/auth';
 import { auth } from '../lib/firebase';
+import { useAuth } from '../context/AuthContext';
 import { motion, AnimatePresence } from 'motion/react';
 import { LogIn, UserPlus, Zap, Github, Twitter, ShieldCheck } from 'lucide-react';
+
+// Map Firebase error codes to user-friendly messages
+const getAuthErrorMessage = (code: string): string => {
+  const errorMessages: Record<string, string> = {
+    'auth/invalid-email': 'Invalid email address format.',
+    'auth/user-disabled': 'This account has been disabled.',
+    'auth/user-not-found': 'No account found with this email.',
+    'auth/wrong-password': 'Incorrect password.',
+    'auth/invalid-credential': 'Invalid email or password.',
+    'auth/email-already-in-use': 'An account with this email already exists.',
+    'auth/weak-password': 'Password should be at least 6 characters.',
+    'auth/network-request-failed': 'Network error. Please check your connection.',
+    'auth/too-many-requests': 'Too many attempts. Please try again later.',
+    'auth/operation-not-allowed': 'This sign-in method is not enabled.',
+  };
+  return errorMessages[code] || 'Authentication failed. Please try again.';
+};
 
 export default function Login() {
   const [isLogin, setIsLogin] = useState(true);
@@ -13,21 +31,46 @@ export default function Login() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { user, loading: authLoading } = useAuth();
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (!authLoading && user) {
+      navigate('/dashboard', { replace: true });
+    }
+  }, [user, authLoading, navigate]);
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);
+    
     try {
       if (isLogin) {
-        await signInWithEmailAndPassword(auth, email, password);
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        // Verify we got a valid user with token
+        if (userCredential.user) {
+          const token = await userCredential.user.getIdToken();
+          if (token) {
+            navigate('/dashboard', { replace: true });
+          } else {
+            throw new Error('Failed to obtain authentication token');
+          }
+        }
       } else {
+        if (!username.trim()) {
+          setError('Username is required for registration.');
+          setLoading(false);
+          return;
+        }
         const res = await createUserWithEmailAndPassword(auth, email, password);
         await updateProfile(res.user, { displayName: username });
+        navigate('/dashboard', { replace: true });
       }
-      navigate('/dashboard');
     } catch (err: any) {
-      setError(err.message);
+      console.error('[v0] Auth error:', err);
+      const errorMessage = err.code ? getAuthErrorMessage(err.code) : err.message;
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -36,6 +79,7 @@ export default function Login() {
   const handleGuestLogin = async () => {
     setLoading(true);
     setError('');
+    
     try {
       // Create a unique guest email and password
       const guestId = Math.random().toString(36).substring(7);
@@ -45,20 +89,30 @@ export default function Login() {
       try {
         const res = await createUserWithEmailAndPassword(auth, guestEmail, guestPass);
         await updateProfile(res.user, { displayName: `Guest_${guestId}` });
-        navigate('/dashboard');
-      } catch (e) {
-        // If user somehow exists, try signing in
-        await signInWithEmailAndPassword(auth, guestEmail, guestPass);
-        navigate('/dashboard');
+        
+        // Verify token before navigating
+        const token = await res.user.getIdToken();
+        if (token) {
+          navigate('/dashboard', { replace: true });
+        } else {
+          throw new Error('Failed to create guest session');
+        }
+      } catch (createError: any) {
+        // If email creation is disabled, try anonymous auth
+        if (createError.code === 'auth/operation-not-allowed' || createError.code === 'auth/admin-restricted-operation') {
+          const anonResult = await signInAnonymously(auth);
+          const token = await anonResult.user.getIdToken();
+          if (token) {
+            navigate('/dashboard', { replace: true });
+          }
+        } else {
+          throw createError;
+        }
       }
     } catch (err: any) {
-      setError("Protocols restricted. Using legacy anonymous sync...");
-      try {
-        await signInAnonymously(auth);
-        navigate('/dashboard');
-      } catch (anonErr: any) {
-        setError("GRID OFFLINE: " + anonErr.message);
-      }
+      console.error('[v0] Guest login error:', err);
+      const errorMessage = err.code ? getAuthErrorMessage(err.code) : err.message;
+      setError(errorMessage || 'Guest access unavailable. Please register or try again.');
     } finally {
       setLoading(false);
     }
