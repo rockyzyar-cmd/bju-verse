@@ -29,7 +29,9 @@ import {
   Sparkles,
   Command,
   Search,
-  Grid
+  Grid,
+  Sun,
+  Moon
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { allComponents } from '../components-data';
