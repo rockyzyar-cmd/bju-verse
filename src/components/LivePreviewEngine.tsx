@@ -29,57 +29,12 @@ export const LivePreviewEngine: React.FC<Props> = React.memo(({
 
   // srcDoc recomputes when theme changes to ensure fresh container
   const srcDoc = useMemo(() => {
-    // Mega Library Suite: God-Level Features
+    // Essential libraries only - loaded on demand for performance
     const libs = `
       <script src="https://cdn.tailwindcss.com"></script>
-      
-      <!-- Animation Super-Suite -->
       <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/Draggable.min.js"></script>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/MotionPathPlugin.min.js"></script>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/TextPlugin.min.js"></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/velocity/1.5.2/velocity.min.js"></script>
-      
-      <!-- 3D & Graphics God-Level -->
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.158.0/three.min.js"></script>
-      <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/examples/js/controls/OrbitControls.js"></script>
-      <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/examples/js/loaders/GLTFLoader.js"></script>
-      <script src="https://cdn.jsdelivr.net/npm/three-stdlib@2.28.9/dist/three-stdlib.umd.min.js"></script>
-      <script src="https://cdn.jsdelivr.net/npm/three-gpu-pathtracer@0.0.18/build/index.umd.cjs"></script>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/7.3.2/pixi.min.js"></script>
-      <script src="https://cdn.babylonjs.com/babylon.js"></script>
-      <script src="https://unpkg.com/ogl"></script>
-      <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.waves.min.js"></script>
-      
-      <!-- Physics & Math -->
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
-      <script src="https://cdn.jsdelivr.net/npm/cannon-es@0.20.0/dist/cannon-es.js"></script>
-      <script src="https://cdn.jsdelivr.net/npm/ammo.js@0.0.10/ammo.js"></script>
-      <script src="https://cdn.jsdelivr.net/npm/maath@0.10.7/dist/maath.umd.js"></script>
-      <script src="https://cdn.jsdelivr.net/npm/detect-gpu@5.0.37/dist/detect-gpu.umd.js"></script>
-      
-      <!-- Creative Coding & Interaction -->
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
       <script src="https://unpkg.com/lucide@latest"></script>
-      <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-      <script src="https://cdn.jsdelivr.net/npm/gpu.js@2.16.0/dist/gpu-browser.min.js"></script>
-      
-      <!-- Specialized Utilities -->
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.min.js"></script>
-      <script src="https://cdn.jsdelivr.net/npm/lenis@1.0.28/dist/lenis.min.js"></script>
-      <script src="https://cdn.jsdelivr.net/npm/popmotion@11.0.5/dist/popmotion.global.min.js"></script>
-      <script src="https://cdn.jsdelivr.net/npm/stats.js@0.17.0/build/stats.min.js"></script>
-      <script src="https://cdn.jsdelivr.net/npm/lil-gui@0.19.1/dist/lil-gui.umd.min.js"></script>
-      <script src="https://cdn.jsdelivr.net/npm/gl-matrix@3.4.3/gl-matrix-min.js"></script>
-      <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
-      <script src="https://cdn.jsdelivr.net/npm/leva@0.9.34/dist/leva.umd.min.js"></script>
-      <script src="https://unpkg.com/troika-three-text"></script>
-      <script src="https://cdn.jsdelivr.net/npm/three-mesh-bvh@0.6.8/build/index.umd.cjs"></script>
     `;
 
     return `
