@@ -1,0 +1,37 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Profile",
+      "description": "Stores user profile and personalization data",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "username": { "type": "string" },
+        "email": { "type": "string" },
+        "theme": { "type": "string", "enum": ["dark", "light"] },
+        "savedIds": { "type": "array" },
+        "forkedIds": { "type": "array" },
+        "favoritesIds": { "type": "array" },
+        "isAdmin": { "type": "boolean" }
+      },
+      "required": ["uid", "username"]
+    },
+    "Component": {
+      "title": "UI Component",
+      "description": "Metadata for uploaded components (if we add upload feature)",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "authorId": { "type": "string" },
+        "code": { "type": "object" }
+      }
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profile document"
+    }
+  }
+}
